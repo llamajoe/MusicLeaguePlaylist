@@ -34,6 +34,7 @@ const App = () => {
   return (
     <div className="container">
       <h1>Music League Playlist</h1>
+      <div>Total songs: {tracks.length}</div>
       <input
         type="text"
         placeholder="Search for artists or songs..."
