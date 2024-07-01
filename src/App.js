@@ -10,20 +10,28 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const fetchPlaylist = async () => {
+    const fetchAllTracks = async (url, allTracks = []) => {
       try {
-        const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+        const response = await axios.get(url, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
         });
-        setTracks(response.data.tracks.items);
+
+        const newTracks = response.data.tracks.items;
+        const combinedTracks = [...allTracks, ...newTracks];
+
+        if (response.data.tracks.next) {
+          fetchAllTracks(response.data.tracks.next, combinedTracks);
+        } else {
+          setTracks(combinedTracks);
+        }
       } catch (error) {
         console.error('Error fetching playlist', error);
       }
     };
 
-    fetchPlaylist();
+    fetchAllTracks(`https://api.spotify.com/v1/playlists/${playlistId}?limit=100`);
   }, []);
 
   const filteredTracks = tracks.filter(item =>
@@ -33,7 +41,7 @@ const App = () => {
 
   return (
     <div className="container">
-      <h1>Music League Playlist</h1>
+      <h1>My Spotify Playlist</h1>
       <div>Total songs: {tracks.length}</div>
       <input
         type="text"
