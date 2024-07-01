@@ -33,20 +33,20 @@ const App = () => {
 
   return (
     <div className="container">
-      <h1>My Spotify Playlist</h1>
+      <h1>Music League Playlist</h1>
       <input
         type="text"
         placeholder="Search for artists or songs..."
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />
-      <div className="playlist">
+      <ul className="playlist">
         {filteredTracks.map(item => (
-          <div key={item.track.id} className="song">
+          <li key={item.track.id} className="song">
             {item.track.name} by {item.track.artists.map(artist => artist.name).join(', ')}
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };
