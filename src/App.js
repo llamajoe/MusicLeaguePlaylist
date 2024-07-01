@@ -2,7 +2,7 @@ import React, { useState, useEffect }  from 'react';
 import axios from 'axios';
 import './App.css'
 
-const accessToken = 'BQAOGUsbOENnJDfJXh7OY9vvTaqq_zUTWnDnOSQzMUSN1WHMtuP5Is_dmxC-fci4ArLkTYLmYDDWoWcoORwl0Nv2ctvLwWGMscvhV-DX6J3XPcBGe9vSrvd9g5G_YieQ-XqmEpjzSEckgnQuWD1duNoUwloA_fcKmqOnbRiI_rb83yp4z7QBp89EebVD0xwluOIUW70TiQXYC25G5b-YPobF248sCbEFy_YhlwCe7rnf7Qg9ddm3T7QqykUpwG_Sjxc'; // Get this from your server or directly if it’s public
+const accessToken = 'BQBSOBgWL2jCWF18MI9rSdZcluQ1tDqQnYo9XWER_y4lcq8EGlvqKdP_7diLluFEvH_oaACMmB2JOj-y8Uuj1aPjjZwGxaEDaj0p8Z6CgHFfQQdg-RTL6f_yNuUWsf7A7vCc6q4QMrV5p25_FtrvwaLanZ6FJa-HxxlPzCDzemvg38fwbjJx2VGoGY116mbmXb1XoeQ2zuiGdSEJqgQMzXBK_d7Qiqv4XZau55-zCing49HhdkI5tByMEjwLWCrgnOE'; // Get this from your server or directly if it’s public
 const playlistId = '08r1zZNMsVQ1QexBA9rquq'; // Replace with your Spotify playlist ID
 
 const App = () => {
@@ -22,7 +22,7 @@ const App = () => {
         const combinedTracks = [...allTracks, ...newTracks];
 
         if (response.data.tracks.next) {
-          fetchAllTracks(response.data.tracks.next, combinedTracks);
+          await fetchAllTracks(response.data.tracks.next, combinedTracks);
         } else {
           setTracks(combinedTracks);
         }
