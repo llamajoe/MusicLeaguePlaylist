@@ -2,14 +2,34 @@ import React, { useState, useEffect }  from 'react';
 import axios from 'axios';
 import './App.css'
 
-const accessToken = 'BQBSOBgWL2jCWF18MI9rSdZcluQ1tDqQnYo9XWER_y4lcq8EGlvqKdP_7diLluFEvH_oaACMmB2JOj-y8Uuj1aPjjZwGxaEDaj0p8Z6CgHFfQQdg-RTL6f_yNuUWsf7A7vCc6q4QMrV5p25_FtrvwaLanZ6FJa-HxxlPzCDzemvg38fwbjJx2VGoGY116mbmXb1XoeQ2zuiGdSEJqgQMzXBK_d7Qiqv4XZau55-zCing49HhdkI5tByMEjwLWCrgnOE'; // Get this from your server or directly if it’s public
 const playlistId = '08r1zZNMsVQ1QexBA9rquq'; // Replace with your Spotify playlist ID
+
+const clientId = '4c52c453c31042e9a10fb7715d09f9b3'; // Replace with your Spotify client ID
+const clientSecret = '464e3bd5cf2647889a4f93b0bc7692c4'; // Replace with your Spotify client secret
+
 
 const App = () => {
   const [tracks, setTracks] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [accessToken, setAccessToken] = useState('');
 
   useEffect(() => {
+    const fetchAccessToken = async () => {
+      const tokenUrl = 'https://accounts.spotify.com/api/token';
+      const headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + btoa(`${clientId}:${clientSecret}`)
+      };
+      const data = 'grant_type=client_credentials';
+
+      try {
+        const response = await axios.post(tokenUrl, data, { headers });
+        setAccessToken(response.data.access_token);
+      } catch (error) {
+        console.error('Error fetching access token', error);
+      }
+    };
+
     const fetchAllTracks = async (url, allTracks = []) => {
       try {
         const response = await axios.get(url, {
@@ -31,8 +51,13 @@ const App = () => {
       }
     };
 
-    fetchAllTracks(`https://api.spotify.com/v1/playlists/${playlistId}?limit=100`);
-  }, []);
+    const initialize = async () => {
+      await fetchAccessToken();
+      await fetchAllTracks(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`);
+    };
+
+    initialize();
+  }, [accessToken]);
 
   const filteredTracks = tracks.filter(item =>
     item.track.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
