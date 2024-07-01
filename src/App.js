@@ -24,9 +24,11 @@ const App = () => {
 
       try {
         const response = await axios.post(tokenUrl, data, { headers });
+        console.log('Access token response:', response); // Log the response
         setAccessToken(response.data.access_token);
       } catch (error) {
-        console.error('Error fetching access token', error);
+        console.error('Error fetching access token:', error);
+        console.log('Error response:', error.response); // Log the error response
       }
     };
 
