@@ -3,81 +3,95 @@ import axios from 'axios';
 import './App.css'
 
 const playlistId = '08r1zZNMsVQ1QexBA9rquq'; // Replace with your Spotify playlist ID
-
 const clientId = '4c52c453c31042e9a10fb7715d09f9b3'; // Replace with your Spotify client ID
 const clientSecret = '464e3bd5cf2647889a4f93b0bc7692c4'; // Replace with your Spotify client secret
 
-
 const App = () => {
   const [tracks, setTracks] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [accessToken, setAccessToken] = useState('');
+  const [error, setError] = useState(null);
+  const [fetching, setFetching] = useState(false); // State to manage fetching status
 
-  useEffect(() => {
-    const fetchAccessToken = async () => {
-      const tokenUrl = 'https://accounts.spotify.com/api/token';
-      const headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + btoa(`${clientId}:${clientSecret}`)
-      };
-      const data = 'grant_type=client_credentials';
+  const fetchTracks = async () => {
+    setFetching(true); // Set fetching status to true
 
-      try {
-        const response = await axios.post(tokenUrl, data, { headers });
-        console.log('Access token response:', response); // Log the response
-        setAccessToken(response.data.access_token);
-      } catch (error) {
-        console.error('Error fetching access token:', error);
-        console.log('Error response:', error.response); // Log the error response
-      }
+    const tokenUrl = 'https://accounts.spotify.com/api/token';
+    const headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Basic ' + btoa(`${clientId}:${clientSecret}`)
     };
+    const data = 'grant_type=client_credentials';
 
-    const fetchAllTracks = async (url, allTracks = []) => {
+    try {
+      const response = await axios.post(tokenUrl, data, { headers });
+      console.log('Access token response:', response); // Log the response
+      const accessToken = response.data.access_token;
+      await fetchAllTracks(accessToken);
+    } catch (error) {
+      console.error('Error fetching access token:', error);
+      console.log('Error response:', error.response); // Log the error response
+      setError('Error fetching access token');
+      setFetching(false); // Set fetching status to false on error
+    }
+  };
+
+  const fetchAllTracks = async (accessToken) => {
+    const maxAttempts = 10;
+    let allTracks = [];
+    let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`;
+    let attempts = 0;
+
+    while (nextUrl && attempts < maxAttempts) {
       try {
-        const response = await axios.get(url, {
+        const response = await axios.get(nextUrl, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
         });
 
-        const newTracks = response.data.tracks.items;
-        const combinedTracks = [...allTracks, ...newTracks];
-
-        if (response.data.tracks.next) {
-          await fetchAllTracks(response.data.tracks.next, combinedTracks);
-        } else {
-          setTracks(combinedTracks);
+        if (response.status !== 200) {
+          console.error('Error fetching playlist: Invalid response status', response);
+          if (response.status === 429) {
+            setError('Too Many Requests - Please try again later');
+          } else {
+            setError(`HTTP Error: ${response.status}`);
+          }
+          break; // Stop fetching if response status is not 200
         }
+
+        const newTracks = response.data.items;
+        allTracks = [...allTracks, ...newTracks];
+        nextUrl = response.data.next;
       } catch (error) {
         console.error('Error fetching playlist', error);
+        setError('Error fetching playlist: ' + error.message);
+        break; // Stop fetching on error
       }
-    };
+      attempts++;
+    }
 
-    const initialize = async () => {
-      await fetchAccessToken();
-      await fetchAllTracks(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`);
-    };
+    setTracks(allTracks);
+    setFetching(false); // Set fetching status to false after fetching is done
+  };
 
-    initialize();
-  }, [accessToken]);
-
-  const filteredTracks = tracks.filter(item =>
-    item.track.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.track.artists.some(artist => artist.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Handle button click to fetch tracks
+  const handleFetchButtonClick = () => {
+    fetchTracks();
+  };
 
   return (
     <div className="container">
       <h1>My Spotify Playlist</h1>
-      <div>Total songs: {tracks.length}</div>
-      <input
-        type="text"
-        placeholder="Search for artists or songs..."
-        value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
-      />
+      <button onClick={handleFetchButtonClick} disabled={fetching}>
+        {fetching ? 'Fetching...' : 'Fetch Tracks'}
+      </button>
+      {error && (
+        <div className="error-message">
+          <p>{error}</p>
+        </div>
+      )}
+      <div>Total songs: {tracks.length}</div> {/* Display total number of tracks */}
       <ul className="playlist">
-        {filteredTracks.map(item => (
+        {tracks.map(item => (
           <li key={item.track.id} className="song">
             {item.track.name} by {item.track.artists.map(artist => artist.name).join(', ')}
           </li>
