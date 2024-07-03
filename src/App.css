@@ -4,9 +4,6 @@ body {
     color: white;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     min-height: 100vh;
 }
 
@@ -15,7 +12,8 @@ body {
     width: 90%;
     max-width: 800px;
     margin: 0 auto;
-    padding: 10px; /* Added padding */
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 button {
@@ -38,7 +36,7 @@ input {
     margin-bottom: 20px;
     padding: 10px;
     width: 100%;
-    box-sizing: border-box; /* Added to ensure padding and border are included in the width */
+    box-sizing: border-box;
     border-radius: 5px;
     border: 1px solid #333;
     background-color: white;
@@ -58,7 +56,6 @@ table {
     border-collapse: collapse;
     margin: 20px 0;
     overflow-x: auto;
-    display: block;
 }
 
 th, td {
@@ -70,4 +67,22 @@ th, td {
 .error {
     color: red;
     margin-top: 20px;
+}
+
+/* Media queries for smaller devices */
+@media (max-width: 600px) {
+    .container {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    th, td {
+        word-wrap: break-word;
+    }
 }
