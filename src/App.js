@@ -105,7 +105,7 @@ const App = () => {
 
   return (
     <div className="container">
-      <h1>My Spotify Playlist</h1>
+      <h1>Music League Playlist</h1>
       {!playlistFetched && (
         <button onClick={handleFetchTracks} disabled={isFetching}>
           {isFetching ? 'Fetching...' : 'Fetch Playlist'}
