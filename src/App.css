@@ -1,9 +1,13 @@
+
 body {
     font-family: Arial, sans-serif;
     background-color: #121212;
     color: white;
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
 }
 
@@ -12,8 +16,7 @@ body {
     width: 90%;
     max-width: 800px;
     margin: 0 auto;
-    padding: 10px;
-    box-sizing: border-box;
+    padding: 10px; /* Added padding */
 }
 
 button {
@@ -35,8 +38,8 @@ button:disabled {
 input {
     margin-bottom: 20px;
     padding: 10px;
-    width: 100%;
-    box-sizing: border-box;
+    width: 90%;
+    box-sizing: border-box; /* Added to ensure padding and border are included in the width */
     border-radius: 5px;
     border: 1px solid #333;
     background-color: white;
@@ -49,6 +52,7 @@ input.search-box {
     background-color: white;
     z-index: 1000;
     border: 1px solid #333;
+    font-size: 16px; 
 }
 
 table {
@@ -56,6 +60,7 @@ table {
     border-collapse: collapse;
     margin: 20px 0;
     overflow-x: auto;
+    display: block;
 }
 
 th, td {
@@ -70,9 +75,9 @@ th, td {
 }
 
 /* Media queries for smaller devices */
-@media (max-width: 600px) {
+@media (max-width: 650px) {
     .container {
-        width: 100%;
+        width: 95%;
         padding: 0 10px;
     }
 
